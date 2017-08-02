@@ -1,0 +1,3 @@
+/home/ankur/CLionProjects/FileIni/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/ankur/CLionProjects/FileIni/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/ankur/CLionProjects/FileIni/cmake-build-debug/CMakeFiles/FileIni.dir
