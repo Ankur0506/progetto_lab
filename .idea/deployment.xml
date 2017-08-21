@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-<<<<<<< HEAD
-  <component name="PublishConfigData" uploadOnCheckin="34ef7c6b-77be-4f2f-b122-612822107951">
-=======
-  <component name="PublishConfigData" serverName="github.com" uploadOnCheckin="34ef7c6b-77be-4f2f-b122-612822107951">
->>>>>>> origin/master
-    <option name="myUploadOnCheckinName" value="github.com" />
+  <component name="PublishConfigData">
+    <serverData>
+      <paths name="github.com">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
   </component>
 </project>
