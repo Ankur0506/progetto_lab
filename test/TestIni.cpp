@@ -4,7 +4,7 @@
 
 #include "gtest/gtest.h"
 #include "../ReadWriteIni.h"
-#include "../"
+
 
 
 class TestIniSuite : public ::testing::Test {
@@ -21,7 +21,10 @@ protected:
 
 
 TEST_F(TestIniSuite, TestReading) {
-    ASSERT_EQ("prova.ini",file.getPathFIle()) << "functions setPathFIle and/or getPathFIle doesn't set or read file path";
-    ASSERT_NE(nullptr,file.readIni("Sezione1","versione", nullptr)) << "impossible to access Key";
+    std::string  s= file.readIni("Sezione2","versione");
+    const char * c = s.c_str();
+    std::cout<<file.readIni("Sezione2","versione")<<std::endl;
+    ASSERT_STREQ((file.readIni("Sezione2","versione")).c_str(),"error")<< "";
+
 }
 

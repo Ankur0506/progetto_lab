@@ -12,8 +12,9 @@ void ReadWriteIni::writeIni(std::string section, std::string key, std::string va
 
 }
 
-void ReadWriteIni::readIni(std::string section, std::string key, std::string error = nullptr) {
+std::string ReadWriteIni::readIni(std::string section, std::string key, std::string error ) {
 
+    return error;
 }
 
 const std::string &ReadWriteIni::getPathFIle() const {
