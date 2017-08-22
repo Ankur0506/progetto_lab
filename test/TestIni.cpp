@@ -23,7 +23,7 @@ protected:
 TEST_F(TestIniSuite, TestReading) {
     std::string  s= file.readIni("Sezione2","versione");
     const char * c = s.c_str();
-    std::cout<<file.readIni("Sezione2","versione")<<std::endl;
+    //std::cout<<file.readIni("Sezione2","versione")<<std::endl;
     ASSERT_STREQ((file.readIni("Sezione2","versione")).c_str(),"error")<< "";
 
 }
