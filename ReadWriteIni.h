@@ -7,14 +7,25 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 class ReadWriteIni {
 public:
     explicit ReadWriteIni(std::string address = "") : pathFIle(std::move(address)) {};
     ~ReadWriteIni() = default;
 
+
+
+
+    void writeIni( std::string section,std::string key, float value);
+    void writeIni( std::string section,std::string key, int value);
+    void writeIni( std::string section,std::string key, double value);
     void writeIni( std::string section,std::string key, std::string value);
+    void writeIni( std::string section);
+
     std::string readIni (std::string section,std::string key, std::string error = "error");
+    std::vector<std::string> readIni (std::string section);
+    std::vector<std::string> readIni ();
 
     const std::string &getPathFIle() const;
     void setPathFIle(const std::string &pathFIle);

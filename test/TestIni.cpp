@@ -19,12 +19,45 @@ protected:
     ReadWriteIni file;
 };
 
-
-TEST_F(TestIniSuite, TestReading) {
-    std::string  s= file.readIni("Sezione2","versione");
-    const char * c = s.c_str();
-    //std::cout<<file.readIni("Sezione2","versione")<<std::endl;
-    ASSERT_STREQ((file.readIni("Sezione2","versione")).c_str(),"error")<< "";
-
+TEST_F(TestIniSuite, TestPath) {
+    ASSERT_STREQ((file.getPathFIle()).c_str(),"prova.ini")<< "path different from the one set in the suit";
+    file.setPathFIle("file.ini");
+    ASSERT_STREQ((file.getPathFIle()).c_str(),"file.ini")<< "problems with setting path function";
 }
 
+TEST_F(TestIniSuite, TestReading) {
+    ASSERT_STREQ((file.readIni("Sezione1","versione")).c_str(),"1")<< "impossible to read the key of first section";
+    ASSERT_STREQ((file.readIni("Sezione2","versione")).c_str(),"2")<< "impossible to read the key of second section";
+    auto sections = file.readIni();
+    ASSERT_STREQ((sections[1]).c_str(),"Sezione2");
+    auto keys = file.readIni("Sezione1");
+    ASSERT_STREQ((keys[0]).c_str(),"versione");
+}
+
+TEST_F(TestIniSuite, TestWriting) {
+    file.writeIni("Sezione1","name","player1");
+    file.writeIni("Sezione1","LV",13);
+    file.writeIni("Sezione1","hp",122);
+
+    EXPECT_EQ(std::stoi(file.readIni("Sezione1","hp")),122);
+    EXPECT_STREQ(file.readIni("Sezione1","name").c_str(),"player1");
+    EXPECT_EQ(std::stoi(file.readIni("Sezione1","LV")),13);
+
+    file.writeIni("Sezione3","name","player3");
+    file.writeIni("Sezione3","LV",15);
+    file.writeIni("Sezione3","hp",134);
+    file.writeIni("Sezione3","speed",16/3.f);
+    file.writeIni("Sezione3","strength",18.9);
+    file.writeIni("Sezione3","pro user",true);
+    EXPECT_STREQ((file.readIni("Sezione3","name")).c_str(),"player3");
+    EXPECT_EQ(std::stoi(file.readIni("Sezione3","hp")),158);
+    EXPECT_EQ(std::stoi(file.readIni("Sezione3","LV")),15);
+    EXPECT_EQ(std::stof(file.readIni("Sezione3","speed")),16/3.f);
+    EXPECT_EQ(std::stod(file.readIni("Sezione3","strength")),18.9);
+    EXPECT_EQ((file.readIni("Sezione3","LV")).c_str(),"true");
+
+    auto sections = file.readIni();
+    EXPECT_STREQ((sections[1]).c_str(),"Sezione2");
+    auto keys = file.readIni(sections[2]);
+    EXPECT_EQ(std::stof(keys[3]),16/3.f));
+}
