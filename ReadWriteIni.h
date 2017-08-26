@@ -6,8 +6,8 @@
 #define PROGETTO_LAB_WRITEINI_H
 
 #include <string>
-#include <utility>
-#include <vector>
+#include <fstream>
+#include <list>
 
 class ReadWriteIni {
 public:
@@ -24,8 +24,8 @@ public:
     void writeIni( std::string section);
 
     std::string readIni (std::string section,std::string key, std::string error = "error");
-    std::vector<std::string> readIni (std::string section);
-    std::vector<std::string> readIni ();
+    std::list<std::string> readIni (std::string section);
+    std::list<std::string> readIni ();
 
     const std::string &getPathFIle() const;
     void setPathFIle(const std::string &pathFIle);
