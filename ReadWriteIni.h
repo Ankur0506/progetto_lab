@@ -7,7 +7,7 @@
 
 #include <string>
 #include <fstream>
-#include <list>
+#include <vector>
 
 class ReadWriteIni {
 public:
@@ -23,15 +23,16 @@ public:
     void writeIni( std::string section,std::string key, std::string value);
     void writeIni( std::string section);
 
-    std::string readIni (std::string section,std::string key, std::string error = "error");
-    std::list<std::string> readIni (std::string section);
-    std::list<std::string> readIni ();
+    std::string readIni (const std::string &section,const std::string &key);
+    std::vector<std::string> readIni (const std::string &section);
+    std::vector<std::string> readIni ();
 
     const std::string &getPathFIle() const;
     void setPathFIle(const std::string &pathFIle);
 
 private:
     std::string pathFIle;
+    std::string deleteComment( std::string str);
 };
 
 
