@@ -15,7 +15,7 @@ void ReadWriteIni::writeIni(std::string section) {
     if(!found){
         std::ofstream outfile;
         outfile.open(pathFIle+".ini", std::ios::app);
-        outfile<<"\n["+section+"]\n";
+        outfile<<"\n["+section+"]\n";// separo la sezione con il blocco precedente
         outfile.close();
     }
     else std::cout<<"Section already exist"<<std::endl;
@@ -23,7 +23,7 @@ void ReadWriteIni::writeIni(std::string section) {
 
 void ReadWriteIni::writeIni(const std::string &section, const std::string &key, const std::string &value, std::string comment) {
 
-    bool found = false;;
+    bool written = false;;
     std::vector<std::string> file = readFile();
     std::ofstream outfile;
     std::string str;
@@ -33,48 +33,57 @@ void ReadWriteIni::writeIni(const std::string &section, const std::string &key, 
 
     bool rightSection = false;
     int i;
-    //std::cout<<"file size "<<file.size()<<std::endl;
-    for ( i=0; i<file.size() && !found; i++) {
-        str = file[i];
+    for ( i=0; i<file.size() && !written; i++) {// il ciclo viene eseguito fino a che no si è scritto
+        str = file[i];                          // oppure giunti alla fine del file
         str = deleteComment(str);
-        writeKey(key, value, comment, file, rightSection, i, found, outfile, str);
-        if( !cheackSection(str)) outfile<<"\n";
-        if(!found)outfile<< file[i]+"\n";
-        if(str=="["+section+"]") {
+        writeKey(key, value, comment, file, rightSection, i, written, outfile, str);
+
+        if(!written) {// fin tanto che non vine scritto tutto viene ricopiato
+            if( !cheackSection(str)) outfile<<"\n";// separo la sezione con il blocco precedente
+            outfile<< file[i]+"\n";
+        }
+        if(str=="["+section+"]") { //
             rightSection  = true;
         }
     }
-    for ( i; i<file.size(); i++) outfile<< file[i]+"\n";
-    if(!found) {
-        std::cout<<found<<std::endl;
-        outfile<<"\n["+section+']'+"\n";
-        outfile<<key+"="+value+comment+"\n";
+    for ( i; i<file.size(); i++) {
+        if( !cheackSection(file[i])) outfile<<"\n";
+        outfile<< file[i]+"\n";
     }
-
-    for( i=0;i<file.size(); i++) {
-
-    }
+    IfNotWritten(section, key, value, comment, written, outfile, rightSection);
 
     outfile.close();
 }
 
-void ReadWriteIni::writeKey(const std::string &key, const std::string &value, const std::string &comment, const std::vector<std::string> &file, bool rigthSection, int i, bool &found,
+std::ofstream &ReadWriteIni::IfNotWritten(const std::string &section, const std::string &key, const std::string &value,
+                                          const std::string &comment, bool written, std::ofstream &outfile,
+                                          bool rightSection) const {
+    if(!written ) {
+        if( rightSection) outfile<<key+"="+value+comment+"\n";
+        else {
+            outfile<<"\n["+section+']'+"\n";
+            outfile<<key+"="+value+comment+"\n";
+        }
+
+    }
+    return outfile;
+}
+
+void ReadWriteIni::writeKey(const std::string &key, const std::string &value, const std::string &comment, const std::vector<std::string> &file, bool rigthSection, int i, bool &written,
                             std::ofstream &outfile, std::string &str) const {
     if(rigthSection) {
             if(cheackSection(str) && file.size() - 1 > i){
                 auto posZ = str.find('=');
                 str= str.substr(0,posZ);
                 if( key == str) {
-                    //std::cout<<str<<std::endl;
                     outfile<<str+"="+value+comment+"\n";
-                    found = true;
+                    written = true;
                 }
             }
             else {
-                std::cout<<"branch else "<<file[i]<<std::endl;
-                outfile<< key+"="+value+comment+"\n";
+                outfile<< key+"="+value+comment+"\n\n";
                 outfile<< file[i]+"\n";
-                found = true;
+                written = true;
             }
         }
 }
@@ -90,9 +99,7 @@ std::vector<std::string> ReadWriteIni::readFile() const {
     std::vector<std::__cxx11::string> file;
     if(!infile.fail()) {
         while(getline(infile,str)) {
-            std::cout<<str<<std::endl;
             if(!str.empty())  {
-                std::cout<<str<<std::endl;
                 file.push_back(str);}
         }
         infile.close();

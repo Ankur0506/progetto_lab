@@ -36,10 +36,14 @@ private:
     std::vector<std::string> readFile() const;
 
     void writeKey(const std::string &key, const std::string &value, const std::string &comment,
-                  const std::vector<std::string> &file, bool rigthSection, int i, bool &found, std::ofstream &outfile,
+                  const std::vector<std::string> &file, bool rigthSection, int i, bool &written, std::ofstream &outfile,
                   std::string &str) const;
 
     bool cheackSection(const std::string &str) const;
+
+    std::ofstream &
+    IfNotWritten(const std::string &section, const std::string &key, const std::string &value, const std::string &comment,
+                 bool written, std::ofstream &outfile, bool rightSection) const;
 };
 
 

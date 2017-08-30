@@ -25,4 +25,6 @@ int main() {
     f.writeIni("Programs","games","windows games");
     f.writeIni("Memory","free memory","172 Gb");
     f.writeIni("Programs","driver","");
+    f.writeIni("system","serial number",1943);
+    f.writeIni("internet access","adsblock","true");
 }
