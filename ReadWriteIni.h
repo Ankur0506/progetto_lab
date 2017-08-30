@@ -20,7 +20,7 @@ public:
     void writeIni( std::string section,std::string key, float value);
     void writeIni( std::string section,std::string key, int value);
     void writeIni( std::string section,std::string key, double value);
-    void writeIni( std::string section,std::string key, std::string value);
+    void writeIni(const std::string &section, const std::string &key, const std::string &value, std::string comment="");
     void writeIni( std::string section);
 
     std::string readIni (const std::string &section,const std::string &key);
@@ -33,6 +33,13 @@ public:
 private:
     std::string pathFIle;
     std::string deleteComment( std::string str);
+    std::vector<std::string> readFile() const;
+
+    void writeKey(const std::string &key, const std::string &value, const std::string &comment,
+                  const std::vector<std::string> &file, bool rigthSection, int i, bool &found, std::ofstream &outfile,
+                  std::string &str) const;
+
+    bool cheackSection(const std::string &str) const;
 };
 
 
