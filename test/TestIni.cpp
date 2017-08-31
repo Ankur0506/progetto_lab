@@ -44,20 +44,24 @@ TEST_F(TestIniSuite, TestWriting) {
     EXPECT_EQ(std::stoi(file.readIni("Sezione1","LV")),13);
 
     file.writeIni("Sezione3","name","player3");
-    file.writeIni("Sezione3","LV",15);
-    file.writeIni("Sezione3","hp",134);
     file.writeIni("Sezione3","speed",16/3.f);
     file.writeIni("Sezione3","strength",18.9);
     file.writeIni("Sezione3","pro user",true);
     EXPECT_STREQ((file.readIni("Sezione3","name")).c_str(),"player3");
-    EXPECT_EQ(std::stoi(file.readIni("Sezione3","hp")),158);
-    EXPECT_EQ(std::stoi(file.readIni("Sezione3","LV")),15);
     EXPECT_EQ(std::stof(file.readIni("Sezione3","speed")),16/3.f);
     EXPECT_EQ(std::stod(file.readIni("Sezione3","strength")),18.9);
     EXPECT_EQ((file.readIni("Sezione3","LV")).c_str(),"true");
 
+
     auto sections = file.readIni();
     EXPECT_STREQ((sections[1]).c_str(),"Sezione2");
     auto keys = file.readIni(sections[2]);
-    EXPECT_EQ(std::stof(keys[3]),16/3.f));
+    EXPECT_EQ(std::stof(keys[0]),16/3.f);
+    EXPECT_EQ(keys.size(),3);
+    EXPECT_TRUE(keys[2]);
+
+    file.writeIni("Sezione2","defense",58683.561);
+    file.writeIni("Sezione1","fortune",-34.56);
+    EXPECT_EQ(std::stoi(file.readIni("Sezione2","defense")),58683.561);
+    EXPECT_EQ(std::stoi(file.readIni("Sezione1","fortune")),-34.56);
 }
