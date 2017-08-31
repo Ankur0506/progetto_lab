@@ -72,7 +72,7 @@ std::ofstream &ReadWriteIni::IfNotWritten(const std::string &section, const std:
 void ReadWriteIni::writeKey(const std::string &key, const std::string &value, const std::string &comment, const std::vector<std::string> &file, bool rigthSection, int i, bool &written,
                             std::ofstream &outfile, std::string &str) const {
     if(rigthSection) {
-            if(cheackSection(str) && file.size() - 1 > i){
+            if(cheackSection(str) && file.size()  > i){
                 auto posZ = str.find('=');
                 str= str.substr(0,posZ);
                 if( key == str) {
@@ -128,7 +128,6 @@ std::string ReadWriteIni::readIni(const std::string &section, const std::string 
     bool readOn = false;
     infile.open(pathFIle+".ini");
     if(!infile.fail()){
-        std::cout << "File is open" << std::endl;
         while(getline(infile,str) && !found) {
             str = deleteComment(str);
             if(readOn) {
@@ -158,7 +157,6 @@ std::vector<std::string> ReadWriteIni::readIni(const std::string &section) {
     infile.open(pathFIle+".ini");
     std::vector<std::string> keys;
     if(!infile.fail()){
-        std::cout << "File is open" << std::endl;
         while(getline(infile,str) && !found) {
             str = deleteComment(str);
             if(readOn) {
@@ -190,9 +188,7 @@ std::vector<std::string> ReadWriteIni::readIni() {
     infile.open(pathFIle+".ini");
     std::vector<std::string> sections;
     if(!infile.fail()){
-        std::cout << "File is open" << std::endl;
         while(getline(infile,str)) {
-            std::cout<< str <<std::endl;
             auto posX=str.find('[');
             auto posY=str.find(']');
             if(( posX!= std::string::npos) && ( posY!= std::string::npos)){
