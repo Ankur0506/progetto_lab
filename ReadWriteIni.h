@@ -12,18 +12,13 @@
 class ReadWriteIni {
 public:
     explicit ReadWriteIni(std::string address = "") : pathFIle(std::move(address)) {readFile();};
-    ~ReadWriteIni() {
-        wirteAll();
-    }
+    ~ReadWriteIni() { writeAll(); }
 
-
-
-
-    void writeIni( std::string section,std::string key, float value);
-    void writeIni( std::string section,std::string key, int value);
-    void writeIni( std::string section,std::string key, double value);
-    void writeIni(const std::string &section, const std::string &key, const std::string &value, std::string comment="");
-    void writeIni( std::string section);
+    void writeIni( std::string section,std::string key, float value, std::string comment="");
+    void writeIni( std::string section,std::string key, int value, std::string comment="");
+    void writeIni( std::string section,std::string key, double value, std::string comment="");
+    void writeIni( std::string section, std::string key, std::string value, std::string comment="");
+    void writeIni( std::string section, std::string comment="");
 
     std::string readIni (const std::string &section,const std::string &key);
     std::vector<std::string> readIni (const std::string &section);
@@ -36,10 +31,10 @@ private:
     std::string pathFIle;
     std::vector< std::vector<std::string> > file;
 
-    std::string deleteComment( std::string str);
-    std::vector< std::vector<std::string> > readFile() const;
+    std::string deleteComment( std::string);
+    void readFile();
     bool cheackSection(const std::string &str) const;
-    void wirteAll ();
+    void writeAll ();
 
 };
 
