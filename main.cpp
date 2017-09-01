@@ -35,9 +35,9 @@ int main() {
     f.writeIni("Programs","cmake","true");
     f.writeIni("directory","scrivania","23");
 
-    std::cout<<"\nlettura"<<std::endl;
+/*    std::cout<<"\nlettura"<<std::endl;
     std::cout<<f.readIni("Memory","total memory")<<std::endl;
     std::cout<<f.readIni("Programs","word")<<std::endl;
     std::cout<<f.readIni("Memory")[2]<<std::endl;
-    std::cout<<f.readIni()[3]<<std::endl;
+    std::cout<<f.readIni()[3]<<std::endl;*/
 }

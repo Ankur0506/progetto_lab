@@ -22,86 +22,59 @@ void ReadWriteIni::writeIni(std::string section) {
 }
 
 void ReadWriteIni::writeIni(const std::string &section, const std::string &key, const std::string &value, std::string comment) {
-
-    bool written = false;;
-    std::vector<std::string> file = readFile();
-    std::ofstream outfile;
-    std::string str;
-    outfile.open(pathFIle+".ini");
-
-    if( !comment.empty()) comment = " ;"+comment;
-
-    bool rightSection = false;
-    int i;
-    for ( i=0; i<file.size() && !written; i++) {// il ciclo viene eseguito fino a che no si è scritto
-        str = file[i];                          // oppure giunti alla fine del file
-        str = deleteComment(str);
-        if(rightSection) {// se la sezione è corretta si chiama la funzione
-            writeKey(key, value, comment, file, rightSection, i, written, outfile, str);
+    if( !section.empty() && !key.empty()) {
+        std::string str;
+        bool written = false;
+        if( !comment.empty()) comment = " ;"+comment;
+        int i,k;
+        for ( i=0; i<file.size() && !written; i++) {
+            auto posS= file[i][0].find("["+section+"]");
+            std::cout<<file[i][0]<<std::endl;
+            if( posS != std::string::npos ) {
+                for ( k=1; k<file[i].size() ; k++) {
+                    auto posK= file[i][k].find(key);
+                    //std::cout<<file[i][k];
+                    if( posK != std::string::npos) {
+                        str = file[i][k];
+                        str = deleteComment(str);
+                        file[i][k] = str+"="+value+comment;
+                        written = true;
+                    }
+                }
+                if(file[i].size()==k) {
+                    file[i].push_back(key+"="+value+comment);
+                    written = true;
+                }
+            }
         }
-        if(!written) {// fin tanto che non vine scritto tutto viene ricopiato
-            if( !cheackSection(str)) outfile<<"\n";// separo la sezione con il blocco precedente
-            outfile<< file[i]+"\n";
-        }
-        if(str=="["+section+"]") { // se la sezione è quella giusta
-            rightSection  = true;// il controllo diventa vero
-        }
-    }
-    for ( i; i<file.size(); i++) {// si finisce di copiare il resto del file
-        if( !cheackSection(file[i])) outfile<<"\n";
-        outfile<< file[i]+"\n";
-    }
-    IfNotWritten(section, key, value, comment, written, outfile, rightSection);
-
-    outfile.close();
-}
-
-std::ofstream &ReadWriteIni::IfNotWritten(const std::string &section, const std::string &key, const std::string &value,
-                                          const std::string &comment, bool written, std::ofstream &outfile,
-                                          bool rightSection) const {
-    if(!written ) {
-        if( rightSection) outfile<<key+"="+value+comment+"\n";
-        else {
-            outfile<<"\n["+section+']'+"\n";
-            outfile<<key+"="+value+comment+"\n";
-        }
-
-    }
-    return outfile;
-}
-
-void ReadWriteIni::writeKey(const std::string &key, const std::string &value, const std::string &comment, const std::vector<std::string> &file, bool rigthSection, int i, bool &written,
-                            std::ofstream &outfile, std::string &str) const {
-
-    if(cheackSection(str) && file.size()  > i){
-        auto posZ = str.find('=');
-        str= str.substr(0,posZ);
-        if( key == str) {
-            outfile<<str+"="+value+comment+"\n";
-            written = true;
+        if(!written ) {
+            std::vector<std::string> newSection;
+            newSection.push_back('['+section+']');
+            newSection.push_back(key+"="+value+comment);
+            file.push_back(newSection);
         }
     }
-    else {
-        outfile<< key+"="+value+comment+"\n\n";
-        outfile<< file[i]+"\n";
-        written = true;
-    }
-
+    else std::cout<<" section or key null"<<std::endl;
 }
 
 bool ReadWriteIni::cheackSection(const std::string &str) const {
     return str.find('[') == std::string::npos && str.find(']') == std::string::npos;
 }
 
-std::vector<std::string> ReadWriteIni::readFile() const {
+std::vector< std::vector<std::string> >  ReadWriteIni::readFile() const {
     std::ifstream infile;
+    std::vector<std::string> keys;
     infile.open(pathFIle + ".ini");
     std::string str;
-    std::vector<std::string> file;
+    std::vector< std::vector<std::string> >  file;
     if(!infile.fail()) {
         while(getline(infile,str)) {
             if(!str.empty())  {
-                file.push_back(str);}
+                if(!cheackSection(str)) {
+                    file.push_back(keys);
+                    keys.erase(keys.begin(),keys.end());
+                }
+                keys.push_back(str);}
         }
         infile.close();
     }
@@ -122,96 +95,48 @@ void ReadWriteIni::writeIni(std::string section, std::string key, double value) 
 
 
 std::string ReadWriteIni::readIni(const std::string &section, const std::string &key ) {
-    std::ifstream infile;
-    std::string str;
+
     std::string value;
-    bool found = false;
-    bool readOn = false;
-    infile.open(pathFIle+".ini");
-    if(!infile.fail()){
-        while(getline(infile,str) && !found) {
-            str = deleteComment(str);
-            if(readOn) {
-                if(str.find('[') == std::string::npos || (str.find(']') == std::string::npos)){
-                    auto posZ = str.find('=');
-                    if( key == str.substr(0,posZ)) {
-                        value = str.substr(posZ+1);
-                        found = true;
-                    }
+    for (auto &i : file) {
+        auto posS= i[0].find("["+section+"]");
+        if( posS != std::string::npos ) {
+            for (int k = 1; k < i.size(); k++) {
+                auto posK= i[k].find(key);
+                if( posK != std::string::npos) {
+                    str = file[i][k];
+                    str = deleteComment(str);
+                    file[i][k] = str+"="+value+comment;
+                    written = true;
                 }
-                else readOn=false;
             }
-            if(str=="["+section+"]") readOn = true;
         }
-        if(value.empty()) std::cout<< "section or key doesn't exist"<< std::endl;
-        infile.close();
     }
-    else std::cout<< "Error! the file doesn't exist in this path"<< std::endl;
+    if( value.empty()) std::cout<<"I can't find any section or section without keys"<<std::endl;
     return std::move(value);
 }
 
 std::vector<std::string> ReadWriteIni::readIni(const std::string &section) {
-    std::ifstream infile;
-    std::string str;
-    bool found = false;
-    bool readOn = false;
-    infile.open(pathFIle+".ini");
     std::vector<std::string> keys;
-    if(!infile.fail()){
-        while(getline(infile,str) && !found) {
-            str = deleteComment(str);
-            if(readOn) {
-                if(str.find('[') == std::string::npos || (str.find(']') == std::string::npos)){
-                    auto posZ = str.find('=');
-                    str = str.substr(0,posZ);
-                    if(!str.empty()) {
-                        keys.push_back(std::move(str));
-                    }
-                }
-                else {
-                    readOn=false;
-                    found = true;
-                }
+    for (auto &i : file) {
+        auto posS= i[0].find("["+section+"]");
+        if( posS != std::string::npos ) {
+            for (int k = 1; k < i.size(); k++) {
+                keys.push_back(i[k]);
             }
-            if(str=="["+section+"]") readOn = true;
         }
-        if(keys.empty()) std::cout<< "I can't find this section"<< std::endl;
-        infile.close();
     }
-    else std::cout<< "Error! the file doesn't exist in this path"<< std::endl;
-    return std::move(keys);
-
+    if( keys.empty()) std::cout<<"I can't find any section or section without keys"<<std::endl;
+    return move(keys);
 }
 
 std::vector<std::string> ReadWriteIni::readIni() {
-    std::ifstream infile;
-    std::string str;
-    infile.open(pathFIle+".ini");
     std::vector<std::string> sections;
-    if(!infile.fail()){
-        while(getline(infile,str)) {
-            auto posX=str.find('[');
-            auto posY=str.find(']');
-            if(( posX!= std::string::npos) && ( posY!= std::string::npos)){
-                str = str.substr(posX+1,posY-posX-1);
-                sections.push_back(std::move(str));
-            }
-        }
-        if(sections.empty()) std::cout<< "I can't find any section"<< std::endl;
-        infile.close();
+    for (auto i : file) {
+        sections.push_back(deleteComment(i[0]));
     }
-    else std::cout<< "Error! the file doesn't exist in this path"<< std::endl;
-    return std::move(sections);
+    if( sections.empty()) std::cout<<"I can't find any section"<<std::endl;
+    return move(sections);
 }
-
-const std::string &ReadWriteIni::getPathFIle() const {
-    return pathFIle;
-}
-
-void ReadWriteIni::setPathFIle(const std::string &pathFIle) {
-    ReadWriteIni::pathFIle = pathFIle;
-}
-
 
 
 std::string ReadWriteIni::deleteComment( std::string str){
@@ -224,9 +149,27 @@ std::string ReadWriteIni::deleteComment( std::string str){
     return str;
 }
 
+void ReadWriteIni::wirteAll() {
+    std::ofstream outfile;
+    outfile.open(pathFIle+".ini");
+    int i,k;
+    for ( i=0; i<file.size() ; i++) {
+        outfile<<"\n";
+        for ( k=0; k<file[i].size() ; k++) {
+            outfile<<file[i][k]+"\n";
+        }
+    }
+    outfile.close();
+}
 
+const std::string &ReadWriteIni::getPathFIle() const {
+    return pathFIle;
+}
 
-
-
+void ReadWriteIni::setPathFIle(const std::string &pathFIle) {
+    wirteAll();
+    file.erase(file.begin(),file.end());
+    ReadWriteIni::pathFIle = pathFIle;
+}
 
 
