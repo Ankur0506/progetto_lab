@@ -11,7 +11,7 @@
 
 class ReadWriteIni {
 public:
-    explicit ReadWriteIni(std::string address = "") : pathFIle(std::move(address)) {readFile();};
+    explicit ReadWriteIni(std::string address = "") : pathFIle(std::move(address)) { readFile(); }
     ~ReadWriteIni() { writeAll(); }
 
     void writeIni( std::string section,std::string key, float value, std::string comment="");

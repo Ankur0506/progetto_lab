@@ -8,8 +8,8 @@
 
 int main() {
 
-/*    system("del prova.ini");
-    ReadWriteIni f("prova");
+    system("rm prova.ini");
+    ReadWriteIni f("prova.ini");
     f.writeIni("system","ios","windows");
     f.writeIni("internet access","name","My internet");
     f.writeIni("internet access","password","******", "not visible");
@@ -42,5 +42,5 @@ int main() {
     std::cout<<f.readIni("Memory","total memory")<<std::endl;
     std::cout<<f.readIni("Programs","word")<<std::endl;
     std::cout<<f.readIni("Memory")[2]<<std::endl;
-    std::cout<<f.readIni()[3]<<std::endl;*/
+    std::cout<<f.readIni()[3]<<std::endl;
 }

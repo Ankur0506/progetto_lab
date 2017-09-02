@@ -66,17 +66,21 @@ bool ReadWriteIni::cheackSection(const std::string &str) const {
 void  ReadWriteIni::readFile() {
     std::ifstream infile;
     std::vector<std::string> keys;
-    infile.open(pathFIle + ".ini");
+    infile.open(pathFIle);
     std::string str;
     if(!infile.fail()) {
+        getline(infile,str);
+        keys.push_back(str);
         while(getline(infile,str)) {
             if(!str.empty())  {// we delete empty line
                 if(!cheackSection(str)) {
                     file.push_back(keys);
                     keys.erase(keys.begin(),keys.end());
                 }
-                keys.push_back(str);}
+                keys.push_back(str);
+            }
         }
+        file.push_back(keys);
         infile.close();
     }
 }
@@ -111,7 +115,7 @@ std::string ReadWriteIni::readIni(const std::string &section, const std::string 
             }
         }
     }
-    if( value.empty()) std::cout<<"I can't find any section or section without keys"<<std::endl;
+    if( value.empty()) std::cout<<"value void"<<std::endl;
     return std::move(value);
 }
 
@@ -133,7 +137,9 @@ std::vector<std::string> ReadWriteIni::readIni(const std::string &section) {
 std::vector<std::string> ReadWriteIni::readIni() {
     std::vector<std::string> sections;
     for (auto i : file) {
-        sections.push_back(deleteComment(i[0]));
+        auto posX = i[0].find('[');
+        auto posY = i[0].find(']');
+        sections.push_back(i[0].substr(posX+1,posY-1));
     }
     if( sections.empty()) std::cout<<"I can't find any section"<<std::endl;
     return move(sections);
@@ -151,10 +157,10 @@ std::string ReadWriteIni::deleteComment( std::string str){
 
 void ReadWriteIni::writeAll() {
     std::ofstream outfile;
-    outfile.open(pathFIle+".ini");
+    outfile.open(pathFIle);
     int i,k;
     for ( i=0; i<file.size() ; i++) {
-        outfile<<"\n";
+        if(i!=0) outfile<<"\n";
         for ( k=0; k<file[i].size() ; k++) {
             outfile<<file[i][k]+"\n";
         }
@@ -170,5 +176,6 @@ void ReadWriteIni::setPathFIle(const std::string &pathFIle) {
     writeAll();
     file.erase(file.begin(),file.end());
     ReadWriteIni::pathFIle = pathFIle;
+    readFile();
 }
 

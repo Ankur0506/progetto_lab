@@ -20,19 +20,21 @@ protected:
 };
 
 TEST_F(TestIniSuite, TestSuitPath) {
-    ASSERT_STREQ((file.getPathFIle()).c_str(), "prova.ini") << "path different from the one set in the suit";
+    ASSERT_STREQ((file.getPathFIle()).c_str(),"prova.ini") << "path different from the one set in the suit";
 }
 
 TEST_F(TestIniSuite, TestReading) {
+    system("rm prova.ini");
     ASSERT_STREQ((file.readIni("Sezione1","versione")).c_str(),"1")<< "impossible to read the key of first section";
     ASSERT_STREQ((file.readIni("Sezione2","versione")).c_str(),"2")<< "impossible to read the key of second section";
     auto sections = file.readIni();
-    ASSERT_STREQ((sections[1]).c_str(),"Sezione2");
+    ASSERT_STREQ((sections[0]).c_str(),"Sezione1");
     auto keys = file.readIni("Sezione1");
     ASSERT_STREQ((keys[0]).c_str(),"versione");
 }
 
 TEST_F(TestIniSuite, TestWriting) {
+    system("rm prova.ini");
     file.writeIni("Sezione1","name","player1");
     file.writeIni("Sezione1","LV",13);
     file.writeIni("Sezione1","hp",122);
@@ -70,6 +72,8 @@ TEST_F(TestIniSuite, TestWriting) {
 }
 
 TEST(TestIni, TestPath) {
+    system("rm library.ini");
+    system("rm Album.ini");
     ReadWriteIni file;
     file.setPathFIle("library.ini");
     ASSERT_STREQ((file.getPathFIle()).c_str(),"library.ini")<< "path different from the one set in the suit";
@@ -82,19 +86,22 @@ TEST(TestIni, TestPath) {
     file.writeIni("photo","flash",false);
     file.writeIni("photo","iso",389);
     EXPECT_STREQ((file.readIni("photo","size")).c_str(),"1024x748")<< "problem with changing path";
-    EXPECT_TRUE(std::stoi(file.readIni("photo","flash")));
+    EXPECT_FALSE(std::stoi(file.readIni("photo","flash")));
     EXPECT_STRNE((file.readIni("book","title")).c_str(),"A book")<<"the content of the previous file wasn't erased ";
-    file.setPathFIle("prova.ini");
+    file.setPathFIle("library.ini");
+    std::cout<<file.readIni("book","pages")<<std::endl;
     EXPECT_EQ(std::stoi(file.readIni("book","pages")),156)<< "previous file content was deleted or never written"
                         "after it was closed";
 }
 
 TEST_F(TestIniSuite, TestOverWriting) {
+    system("rm prova.ini");
     file.writeIni("Sezione1","class","1A");
     file.writeIni("Sezione1","passed",false);
     file.writeIni("Sezione1","mark",16.3);
     file.writeIni("Sezione1","class","2A");
     file.writeIni("Sezione1","passed",true);
+    EXPECT_EQ(std::stod(file.readIni("Sezione1","mark")),16.3);
     file.writeIni("Sezione1","mark",27);
     EXPECT_STREQ((file.readIni("Sezione1","class")).c_str(),"2A")<< "key isn't overwritten";
     EXPECT_TRUE(std::stoi(file.readIni("Sezione1","passed")))<< "problems to overwritten bool";
@@ -102,7 +109,9 @@ TEST_F(TestIniSuite, TestOverWriting) {
 }
 
 TEST(TestIni, TestComments) {
-    ReadWriteIni f("testComment");
+    system("rm testComment.ini");
+    ReadWriteIni f;
+    f.setPathFIle("testComment.ini");
     f.writeIni("system","ios","windows");
     f.writeIni("internet access","name","My internet");
     f.writeIni("internet access","password","******", "not visible");
@@ -114,6 +123,8 @@ TEST(TestIni, TestComments) {
     f.writeIni("internet access","theme",3);
     f.writeIni("Memory","ROM memory");
     f.writeIni("system","new version available");
+    f.writeIni("system","version",5.7,"");
+
     EXPECT_STREQ((f.readIni("internet access","password")).c_str(),"******")<< "maybe comment could be added";
     EXPECT_STREQ((f.readIni("system","ram")).c_str(),"4Gb");
     EXPECT_EQ(std::stod(f.readIni("system","version")),5.7);
