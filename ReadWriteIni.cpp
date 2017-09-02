@@ -5,6 +5,8 @@
 #include "ReadWriteIni.h"
 
 #include <iostream>
+#include <utility>
+
 
 void ReadWriteIni::writeIni(std::string section, std::string comment) {
     if( !comment.empty()) comment = " ;"+comment;// if comment isn't null we ad the marker ;
@@ -17,7 +19,7 @@ void ReadWriteIni::writeIni(std::string section, std::string comment) {
         }// stop the cycle if we find the section
     }// we cheack if section dosen't exist already
     if(!found){// we write the new section at the end with push_back
-        std::vector<std::string> newSection;// creation of the vector
+        std::deque<std::string> newSection;// creation of the vector
         newSection.push_back('['+std::move(section)+']'+std::move(comment));// the first one is the name of the section
         file.push_back(newSection);
     }
@@ -50,7 +52,7 @@ void ReadWriteIni::writeIni( std::string section, std::string key, std::string v
             }
         }
         if(!written ) {// if we never get in in any section we have to write a new section and the key
-            std::vector<std::string> newSection;
+            std::deque<std::string> newSection;
             newSection.push_back('['+std::move(section)+']');
             newSection.push_back(std::move(key)+"="+std::move(value)+std::move(comment));
             file.push_back(newSection);
@@ -65,36 +67,38 @@ bool ReadWriteIni::cheackSection(const std::string &str) const {
 
 void  ReadWriteIni::readFile() {
     std::ifstream infile;
-    std::vector<std::string> keys;
+    std::deque<std::string> keys;
     infile.open(pathFIle);
-    std::string str;
     if(!infile.fail()) {
-        getline(infile,str);
-        keys.push_back(str);
-        while(getline(infile,str)) {
-            if(!str.empty())  {// we delete empty line
-                if(!cheackSection(str)) {
-                    file.push_back(keys);
-                    keys.erase(keys.begin(),keys.end());
-                }
-                keys.push_back(str);
-            }
-        }
-        file.push_back(keys);
+        readFileRicorsivo(infile, keys);
         infile.close();
     }
 }
 
+void ReadWriteIni::readFileRicorsivo( std::ifstream &infile, std::deque<std::string> &keys) {
+    std::string str;
+    if(getline(infile, str)) {
+        readFileRicorsivo(infile, keys);
+        if(!str.empty())  {// we delete empty line
+            keys.push_front(str);
+            if(!cheackSection(str)) {
+                file.push_front(keys);
+                keys.erase(keys.begin(),keys.end());
+            }
+        }
+    }
+}
+
 void ReadWriteIni::writeIni(std::string section, std::string key, float value, std::string comment) {
-    writeIni(section, key,std::to_string(value),comment);
+    writeIni(std::move(section), std::move(key),std::to_string(value), std::move(comment));
 }
 
 void ReadWriteIni::writeIni(std::string section, std::string key, int value, std::string comment) {
-    writeIni(section, key,std::to_string(value),comment);
+    writeIni(std::move(section), std::move(key),std::to_string(value), std::move(comment));
 }
 
 void ReadWriteIni::writeIni(std::string section, std::string key, double value, std::string comment) {
-    writeIni(section,key,std::to_string(value),comment);
+    writeIni(std::move(section), std::move(key),std::to_string(value), std::move(comment));
 }
 
 
@@ -115,27 +119,27 @@ std::string ReadWriteIni::readIni(const std::string &section, const std::string 
             }
         }
     }
-    if( value.empty()) std::cout<<"value void"<<std::endl;
+    if( value.empty()) std::cout<<"value not found"<<std::endl;
     return std::move(value);
 }
 
-std::vector<std::string> ReadWriteIni::readIni(const std::string &section) {
-    std::vector<std::string> keys;
+std::deque<std::string> ReadWriteIni::readIni(const std::string &section) {
+    std::deque<std::string> keys;
     for (auto i : file) {
         auto posS= i[0].find("["+section+"]");
         if( posS != std::string::npos ) {
             for (int k = 1; k < i.size(); k++) {
-                auto posEq = i[k].find("=");
+                auto posEq = i[k].find('=');
                 keys.push_back(i[k].substr(0,posEq));
             }
         }
     }
-    if( keys.empty()) std::cout<<"I can't find any section or section without keys"<<std::endl;
+    if( keys.empty()) std::cout<<"I can't find this section or section without keys"<<std::endl;
     return move(keys);
 }
 
-std::vector<std::string> ReadWriteIni::readIni() {
-    std::vector<std::string> sections;
+std::deque<std::string> ReadWriteIni::readIni() {
+    std::deque<std::string> sections;
     for (auto i : file) {
         auto posX = i[0].find('[');
         auto posY = i[0].find(']');

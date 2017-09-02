@@ -5,10 +5,9 @@
 #include <string>
 #include "ReadWriteIni.h"
 
-
 int main() {
-
-    system("rm prova.ini");
+    system("del prova.ini");
+    system("del error.ini");
     ReadWriteIni f("prova.ini");
     f.writeIni("system","ios","windows");
     f.writeIni("internet access","name","My internet");
@@ -42,5 +41,9 @@ int main() {
     std::cout<<f.readIni("Memory","total memory")<<std::endl;
     std::cout<<f.readIni("Programs","word")<<std::endl;
     std::cout<<f.readIni("Memory")[2]<<std::endl;
-    std::cout<<f.readIni()[3]<<std::endl;
+    std::cout<<f.readIni()[0]<<std::endl;
+    f.setPathFIle("error.ini");
+    f.writeIni("bho","non","so");
+    f.setPathFIle("prova.ini");
+    f.writeIni("Veicolo","macchina","auto");
 }
