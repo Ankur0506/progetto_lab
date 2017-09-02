@@ -6,8 +6,8 @@
 #include "ReadWriteIni.h"
 
 int main() {
-    system("del prova.ini");
-    system("del error.ini");
+    system("rm prova.ini");
+    system("rm error.ini");
     ReadWriteIni f("prova.ini");
     f.writeIni("system","ios","windows");
     f.writeIni("internet access","name","My internet");
